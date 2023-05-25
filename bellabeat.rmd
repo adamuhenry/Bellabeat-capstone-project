@@ -1,0 +1,345 @@
+BELLABEAT CASE STUDY
+By Adamu Imonpi Henry
+December-17-2022
+
+## Table of contents
+
+1. About Company
+2. ASK 
+    + 2.1 Business task
+    + 2.2 Stakeholders
+    + 2.4 Bellabeat products for the analysis
+3. Prepare
+    + 3.1 Data collection
+    + 3.2 Privacy and accessibility
+    + 3.3 Data limitations
+    + 3.4 Data organization
+4. process
+    + 4.1 load libraries
+    + 4.2 import data
+    + 4.3 exploring data
+    + 4.4 Checking and Cleaning of data 
+5. Analysis And Share
+6. Act.
+    + 6.1 Conclusion
+    + 6.2 Recommendation
+
+## 1. About Company:
+Bellabeat is a company that manufactures smart Tech products for monitoring women health. It was founded by Urška Sršen and Sando Mur . 
+Bellabeat offers variety  of health trackers such as bellebeat app, Leaf tracker, time(watch), spring bottle etc. 
+They collect the users data and it gets analysed and gives the user information about their health in interractive visuals.
+
+## 2, ASk
+ 2.1 __Business Task:__
+  * What are some trends in smart device usage?
+  * How could these trends apply to bellebeat customers?
+  * How could these trends help influence Bellabeat marketing strategy?
+
+ 2.2 __Stakeholders:__
+  * Urška Sršen: Bellabeat’s cofounder and Chief Creative Officer
+  * Sando Mur: Mathematician and Bellabeat’s cofounder; key member of the Bellabeat executive team
+  * Bellabeat marketing analytics team.
+
+ 2.3  __Bellabeat products for the analysis:__
+  * Bellabeat app: The Bellabeat app provides users with health data related to their activity, sleep, stress, menstrual cycle, and mindfulness habits. This data can help users better understand their current habits and make healthy decisions. The Bellabeat app connects to their line of smart wellness products. 
+  * Leaf: Bellabeat’s classic wellness tracker can be worn as a bracelet, necklace, or clip. The Leaf tracker connects to the Bellabeat app to track activity, sleep, and stress. 
+  * Time: This wellness watch combines the timeless look of a classic timepiece with smart technology to track user activity, sleep, and stress. The Time watch connects to the Bellabeat app to provide you with insights into your daily wellness. 
+  * Spring: This is a water bottle that tracks daily water intake using smart technology to ensure that you are appropriately hydrated throughout the day. The Spring bottle connects to the Bellabeat app to track your hydration levels. 
+  * Bellabeat membership: Bellabeat also oﬀers a subscription-based membership program for users. Membership gives users 24/7 access to fully personalized guidance on nutrition, activity, sleep, health and beauty, and mindfulness based on their lifestyle and goals. 
+
+## 3. Data Organization
+ 3.1 __Data collection:__
+  Data collected from  [fitbit fitness tracker data](http://https://www.kaggle.com/datasets/arashnic/fitbit). it is public domain and was made available through mobius at kaggle.com. the data contains personal fitness tracker record of thirthy fitbit users.
+
+ 3.2 __Privacy and accessibilty:__
+  Thirty eligible users consent to the submission of personal tracker data. The dateset did not come from bellebeat company and credibility is not ascerteined.
+  Metadata contains information about the data types and data description.
+
+ 3.3 __Data limitations:__
+  * There is no information about age, sex and demographics;
+  * Data is not current (2016-04-12 - 2016-05-12);
+  * Small sample size;
+  * Data is not original from BellaBeat.
+
+ 3.4  __Data organization__
+  Data is organized in 18 CSV files. It has both long and wide formats.
+
+## 4 Process
+  The tool for this Task is Rstudio.
+  hence we will install the packages.
+
+__4.1 load libraries__
+```{r libraries}
+library(readr)
+
+library(tidyverse)
+
+library(lubridate)
+
+library(here)
+
+library(skimr)
+
+library(ggplot2)
+
+library(tidyr)
+
+library(dplyr)
+```
+
+__4.2 Import Data__
+
+```{r Importing and storing datasets}
+
+daily_activity<-read.csv("../input/fitbit/dailyActivity_merged.csv")
+daily_sleep<-read.csv("../input/fitbit/sleepDay_merged.csv")
+```
+
+ __4.3 Exploring Data__
+
+```{r  exploring dataset}
+head(daily_activity)
+head(daily_sleep)
+```
+```{r }
+tail(daily_activity)
+tail(daily_sleep)
+```
+
+__4.4 Checking and Cleaning of data__
+
+observe column names
+```{r Veiwing column names}
+colnames(daily_activity)
+colnames(daily_sleep)
+```
+ 
+checking for total number of Na value in each column
+```{r checking for total number of Na value in each column}
+colSums(is.na(daily_activity))
+colSums(is.na(daily_sleep))
+```
+check data structure
+```{r let see the structure of the dataset}
+str(daily_activity)
+str(daily_sleep)
+```
+
+Let change the data type of the variables of the Id and date field.
+from my dataframe the unique Id is in numeric and the date column is in string format
+which have to be change to character and date dtype.
+
+```{r Formatting the date column}
+dailyactivity<-daily_activity %>% mutate()
+dailyactivity<-dailyactivity %>% 
+  mutate(Id=as.character(Id), 
+         ActivityDate=replace_na(as.Date(ActivityDate, format="%m/%d/%Y")))
+```
+
+
+```{r to change the datetime dtype}
+dailysleep <- daily_sleep %>% 
+  mutate(Id = as.character(Id), 
+         SleepDay = as.POSIXct(SleepDay,
+                               format = "%m/%d/%Y %I:%M:%S %p", 
+                               tz = Sys.timezone()))
+```
+
+check again the dtype to make sure they are in the right format
+
+```{r check again the dtype to make sure they are in the right format}
+str(dailyactivity)
+str(dailysleep)
+```
+
+checking for duplicates
+
+```{r checking for duplicates}
+sum(duplicated(dailyactivity))
+sum(duplicated(dailysleep))
+```
+
+There are duplicates in the dataset. 
+Next let dro duplicates
+
+```{r let drop duplicates.}
+dailyactivities<-distinct(dailyactivity)
+dailysleeps<-distinct(dailysleep)
+```
+
+confirm if there are still duplicates.
+
+```{r checking for duplicates again}
+sum(duplicated(dailyactivity))
+sum(duplicated(dailysleep))
+```
+
+# 5. Analysis And Share
+The data is now ready to be transformed into insightful trends and compelling visualizations.
+how many participants are in the dataset
+
+```{r number of particpant in the dataset }
+n_unique(dailyactivities$Id)
+n_unique(dailysleeps$Id)
+```
+
+From our dataset we can see we have 33 participants in the dailyactivities and 24 participants in dailysleeps dataset that will helpful to find insight into the dataset
+Numbers of obervations in the dataset.
+
+```{r let also know the numbers of obervations in the dataset.}
+nrow(dailyactivities)
+nrow(dailysleeps)
+```
+
+from the above result we have 911 observations in the activity dataset and 410 observation in sleepday dataset.
+
+``` {r statistical summary of dataset}
+summary(dailyactivities)
+summary(dailysleeps)
+```
+
+From the statistic available above, you see that the average steps taken by the participants is 7881 and average calories burned is 2317g also the average sedentary minutes of 976 minutes or 16 hours is high. meaning this customers customers spend more of their time be inactive.
+
+__let do few exploration of the data__
+
+``` {r checking for trends}
+ggplot(data=dailyactivities, aes(TotalSteps, Calories))+
+  geom_point()+geom_smooth()+
+  labs(title = "Total Step Against Calories", x="Total steps", y=" Sedentary Minutes", colors="Purple")+
+  theme(panel.background = element_rect(fill = "transparent"))
+```
+
+from the above visual, there is linear relationship between the steps taken to the calories burned.
+
+``` {r also look at the relationship between the steps taken and the sedentary minutes.}
+ggplot(data=dailyactivities, aes(TotalSteps, SedentaryMinutes))+
+  geom_point()+
+  labs(title = "Total Steps Vs Sedentary MInutes", x="Total steps", y="Sedentary minutes")+
+  theme(panel.background = element_rect(fill ="transparent"))
+```
+
+from the visual we can see that no correlation between the steps taken and the sedentary minutes 
+
+__let merge the dataset to plot time in bed to calories burned__
+
+``` {r }
+activitysleep<- merge(dailyactivities, dailysleeps, by="Id", all= FALSE)
+head(activitysleep)
+```
+
+Let see the number of customer this combine dataset captured
+
+``` {r let see the number of customer this combine dataset captured}
+n_distinct(activitysleep$Id)
+```
+
+Due to the fact that the participant has reduce i will like to do an outer join
+
+``` {r due to the fact that the participant has reduce i will like to do an outer join}
+activitysleeps<-merge(dailyactivities, dailysleeps, by="Id", all= TRUE)
+n_distinct(activitysleeps$Id)
+```
+
+let explore to know relationship between time in bed and time asleep.
+
+``` {r }
+ggplot(data=activitysleep, aes(TotalTimeInBed, TotalMinutesAsleep))+
+  geom_point()+geom_smooth()+
+  labs(title="Sleeping Pattern", x="Time in Bed", y="Time ASleep")+
+  theme(panel.background = element_rect(fill = "transparent"))
+```
+
+From this visual we can see that the more time participants spent in bed the more likely they sleep.
+
+
+create a table to group the steps the participants takes into four categories to see which of participants more active.
+
+``` {r }
+average_steps<-activitysleeps %>% 
+  group_by(Id) %>%
+  summarise(avg_step= mean(TotalSteps),
+            avg_cal=mean(Calories)) %>% 
+  mutate(users=case_when(
+    avg_step < 5000 ~ "Sedentary",
+    avg_step >=5000 & avg_step < 7499 ~ "lightly active",
+    avg_step >=7499 & avg_step < 9999 ~ "moderately active",
+    avg_step > 10000 ~ "very active"
+  ))
+average_steps
+```
+
+``` {r  }
+ggplot(average_steps, aes(x=users, y="", fill=users))+
+  geom_bar(stat = "identity", width = 0.5)+
+  labs(title="Degree Of Activeness", x="", y="Steps")+
+  theme(panel.background = element_rect(fill ="transparent"))
+```
+
+Let have a percentage view of of the activeness of the group participant
+
+``` {r  }
+average_steps_percent<-average_steps %>%
+  group_by(users) %>%
+  dplyr::summarise(count = n()) %>%
+  mutate(freq_users = count / sum(count),
+         percent_users = scales::percent(freq_users)) %>%
+  arrange(desc(freq_users)) %>%
+  select(users, freq_users, percent_users)
+
+average_steps_percent
+```
+
+``` {r  percentage view}
+ggplot(average_steps_percent, aes(x = "", y = percent_users, fill = users)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  theme_void() +
+  labs(title = "Percentage of Users by Average Steps") +
+  geom_text(aes(label = percent_users), position = position_stack(vjust = 0.5))
+```
+
+# 6. Act
+__6.1 Conclusion__
+From the analysis, most of the participants are  active and gets enough sleep. The user takes an average of 8,246 steps per day and walks an average of 5.826 miles per day. The user also sleeps an average of 419.4 minutes per day.
+
+Here are some specific details from the data that support this conclusion:
+
+1. The user's total steps per day is above the average for adults in the United States, which is 6,800 steps per day.
+2. The user's total distance walked per day is also above the average for adults in the United States, which is 3.7 miles per day.
+3. The user's total minutes asleep per day is close to the recommended amount for adults, which is 7-8 hours per night.
+Overall, the summary shows that the participants are generally active and gets enough sleep. This is good news for the user's health, as regular physical activity and sleep are important for reducing the risk of chronic diseases such as heart disease, stroke, and diabetes.
+
+__6.2 Recommendation__
+More data about the participants particulars like age, regions etc. and a more comprehensive sample data are needed to get more insight of the participants.
+
+From the analysis above the participants can continue to maintain their current level of activity and sleep. The participants are generally active and gets enough sleep, which is good for their health. However, the participants may want to consider increasing their activity level even more, as this could have additional health benefits. For example, the user could try to walk more often, or they could join a fitness class. The user may also want to consider trying to get more sleep, as this could help them to feel more rested and energized during the day.
+
+For Bellabeat marketing team, Here are some specific tips to help the users of their product to increase their activity level and get more sleep:
+1. Set a goal to walk for at least 30 minutes most days of the week by incorporating a notification alert on the beallabeat Time watch to remind the users.
+2. The team should do an awareness campaign of the efficiency of the bellabeat products to quality sleep and activity level in women fitness classes.
+3  Monitor as they Take the stairs instead of the elevator.
+4. Park further away from your destination and walk the rest of the way.
+5. Go to bed and wake up at the same time each day, even on weekends.
+Also the team should,
+1. Carry out targeted advertising to reach users who are likely to be interested in their products. This can be done by targeting women who have shown an interest in health and fitness, or who have searched for products like the Bellabeat app, Leaf, Time, Spring, or Bellabeat membership. Bellabeat can use a variety of platforms to run targeted ads, including Google Ads, Facebook Ads, and Instagram Ads.
+2. Should use social media to reach a large audience of potential customers. They can create engaging content that highlights the benefits of their products, creating content that is relevant to their target audience and that will encourage them to engage with the brand. They should also use social media to respond to customer questions and comments, and to provide customer support.
+3. Should partner with other brands that appeal to their target audience. For example, they could partner with a fitness studio or a health food store to offer discounts or special promotions. Partnerships can be a great way to reach a new audience and to cross-promote each other's brands.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.
+
