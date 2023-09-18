@@ -298,7 +298,7 @@ ggplot(average_steps_percent, aes(x = "", y = percent_users, fill = users)) +
   geom_text(aes(label = percent_users), position = position_stack(vjust = 0.5))
 ```
 
-# 6. Act
+## 6. Act
 __6.1 Conclusion__
 From the analysis, most of the participants are  active and gets enough sleep. The user takes an average of 8,246 steps per day and walks an average of 5.826 miles per day. The user also sleeps an average of 419.4 minutes per day.
 
